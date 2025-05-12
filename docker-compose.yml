@@ -11,18 +11,18 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
-  web:
-    build: .
-    container_name: nextjs_app
-    ports:
-      - "3000:3000"
-    depends_on:
-      - db
-    environment:
-      DATABASE_URL: postgres://postgres:mysecretpassword@db:5432/apartments_db
-    volumes:
-      - ./:/app
-    command: npm run dev
+  # web:
+  #   build: .
+  #   container_name: nextjs_app
+  #   ports:
+  #     - "3000:3000"
+  #   depends_on:
+  #     - db
+  #   environment:
+  #     DATABASE_URL: postgres://postgres:mysecretpassword@db:5432/apartments_db
+  #   volumes:
+  #     - ./:/app
+  #   command: npm run dev
 
   api:
     build:
@@ -34,11 +34,12 @@ services:
     depends_on:
       - db
     environment:
-      DATABASE_URL: postgres://postgres:mysecretpassword@db:5432/apartments_db
+      - DATABASE_URL=postgres://postgres:mysecretpassword@db:5432/apartments_db
     volumes:
       - ./apartments_backend:/app
+      - ./uploads:/app/uploads
       - /app/node_modules
-    command: sh -c "npx prisma generate && npm run start:dev"
+    command: sh -c "npx prisma migrate dev && npx prisma generate && npm run db:seed && npm run start:dev"
 
 volumes:
   pgdata:
