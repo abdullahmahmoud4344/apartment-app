@@ -1,0 +1,44 @@
+services:
+  db:
+    image: postgres:16
+    container_name: postgres_db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_DB: apartments_db
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  web:
+    build: .
+    container_name: nextjs_app
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://postgres:mysecretpassword@db:5432/apartments_db
+    volumes:
+      - ./:/app
+    command: npm run dev
+
+  api:
+    build:
+      context: ./apartments_backend
+      dockerfile: Dockerfile
+    container_name: nestjs_backend
+    ports:
+      - "3001:3001"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://postgres:mysecretpassword@db:5432/apartments_db
+    volumes:
+      - ./apartments_backend:/app
+      - /app/node_modules
+    command: sh -c "npx prisma generate && npm run start:dev"
+
+volumes:
+  pgdata:
