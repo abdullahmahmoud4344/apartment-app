@@ -30,7 +30,6 @@ export default function ApartmentsPage() {
       queryKey: ["apartments"],
     });
   };
-
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
   if (!apartments) return null;
