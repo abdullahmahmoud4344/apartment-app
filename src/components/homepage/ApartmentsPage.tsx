@@ -50,6 +50,41 @@ export default function ApartmentsPage() {
     start + PAGE_SIZE
   );
 
+  function PageButtons({ numOfPages = 3 }: { numOfPages?: number }) {
+    const midOffset = Math.floor(numOfPages / 2);
+    const firstButton =
+      currentPage <= midOffset + 1
+        ? 1
+        : currentPage < totalPages - midOffset
+        ? currentPage - midOffset
+        : totalPages - (numOfPages - 1);
+
+    const buttons = [];
+
+    for (let i = 0; i < numOfPages; i++) {
+      if (firstButton + i <= totalPages) {
+        buttons.push(firstButton + i);
+      }
+    }
+
+    return buttons.map((button) => (
+      <button
+        key={button}
+        data-page={button}
+        onClick={() => setCurrentPage(button)}
+        disabled={currentPage === button}
+        type="button"
+        className={`px-3 py-1 rounded ${
+          currentPage === button
+            ? "bg-blue-600 text-white"
+            : "bg-gray-200 text-gray-800"
+        }`}
+      >
+        {button}
+      </button>
+    ));
+  }
+
   return (
     <section
       className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
@@ -87,19 +122,7 @@ export default function ApartmentsPage() {
       </div>
 
       <div className="flex justify-center mt-8 space-x-2">
-        {Array.from({ length: totalPages }, (_, i) => (
-          <button
-            key={i}
-            onClick={() => setCurrentPage(i + 1)}
-            className={`px-3 py-1 rounded ${
-              currentPage === i + 1
-                ? "bg-blue-600 text-white"
-                : "bg-gray-200 text-gray-800"
-            }`}
-          >
-            {i + 1}
-          </button>
-        ))}
+        <PageButtons numOfPages={5} />
       </div>
 
       {showModal && (
