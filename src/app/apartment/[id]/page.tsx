@@ -1,15 +1,25 @@
 import { Apartment } from "@/app/models/Apartment.model";
 import Image from "next/image";
-type Props = {
-  params: {
-    id: string;
-  };
-};
 
-export default async function ApartmentDetail({ params }: Props) {
-  const res = await fetch(`http://localhost:3001/apartments/${params.id}`, {
-    cache: "no-store",
-  });
+export default async function ApartmentDetail({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL!}/apartments/${id}`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      method: "GET",
+      next: {
+        revalidate: 60,
+      },
+    }
+  );
 
   if (!res.ok) {
     return <div>Apartment not found.</div>;
@@ -25,7 +35,7 @@ export default async function ApartmentDetail({ params }: Props) {
           <div className="relative w-full h-80 sm:h-96">
             <Image
               src={apartment.images[0]}
-              alt="Apartment hero"
+              alt={`${apartment.unitName} hero`}
               fill
               className="object-cover"
               priority
@@ -51,19 +61,22 @@ export default async function ApartmentDetail({ params }: Props) {
           {/* Image Grid */}
           {apartment.images.length > 1 && (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-6">
-              {apartment.images.slice(1).map((img, index) => (
-                <div
-                  key={index}
-                  className="relative h-48 rounded overflow-hidden"
-                >
-                  <Image
-                    src={img}
-                    alt={`Apartment image ${index + 2}`}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-              ))}
+              {apartment.images.map(
+                (img, index) =>
+                  index > 0 && (
+                    <div
+                      key={index}
+                      className="relative h-48 rounded overflow-hidden"
+                    >
+                      <Image
+                        src={img}
+                        alt={`Apartment image ${index + 2}`}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  )
+              )}
             </div>
           )}
         </div>

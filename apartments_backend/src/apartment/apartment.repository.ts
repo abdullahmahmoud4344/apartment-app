@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
-import { PrismaClient, Apartment, Prisma } from '@prisma/client';
+import { Apartment, Prisma } from '@prisma/client';
 
 @Injectable()
 export class ApartmentRepository {
@@ -26,28 +26,6 @@ export class ApartmentRepository {
     return this.prisma.apartment.update({
       where: { id },
       data,
-    });
-  }
-
-  findWithFilters(query: {
-    unitName?: string;
-    unitNumber?: string;
-    project?: string;
-  }): Promise<Apartment[]> {
-    const { unitName, unitNumber, project } = query;
-
-    return this.prisma.apartment.findMany({
-      where: {
-        ...(unitName && {
-          unitName: { contains: unitName, mode: 'insensitive' },
-        }),
-        ...(unitNumber && {
-          unitNumber: { equals: parseInt(unitNumber, 10) },
-        }),
-        ...(project && {
-          project: { contains: project, mode: 'insensitive' },
-        }),
-      },
     });
   }
 }

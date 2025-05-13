@@ -7,7 +7,6 @@ import {
   Put,
   UploadedFiles,
   UseInterceptors,
-  Query,
 } from '@nestjs/common';
 import { ApartmentService } from './apartment.service';
 import { CreateApartmentDto } from './dto/create-apartment.dto';
@@ -58,17 +57,9 @@ export class ApartmentController {
   )
   uploadImages(@UploadedFiles() files: Express.Multer.File[]) {
     const urls = files.map(
-      (file) => `http://localhost:3001/uploads/${file.filename}`,
+      (file) =>
+        `${process.env.BASE_URL!.replace('localhost', 'api')}/uploads/${file.filename}`,
     );
     return { urls };
-  }
-
-  @Get('search')
-  search(
-    @Query('unitName') unitName?: string,
-    @Query('unitNumber') unitNumber?: string,
-    @Query('project') project?: string,
-  ) {
-    return this.service.findWithFilters({ unitName, unitNumber, project });
   }
 }

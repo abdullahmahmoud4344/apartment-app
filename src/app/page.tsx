@@ -9,10 +9,10 @@ import ApartmentsPage from "@/components/homepage/ApartmentsPage";
 export default async function Home() {
   const queryClient = new QueryClient();
 
-  // Prefetch the "posts" query on the server
+  // Prefetch the "apartments" query on the server
   await queryClient.prefetchQuery({
     queryKey: ["apartments"],
-    queryFn: getApartments,
+    queryFn: () => getApartments(process.env.NEXT_PUBLIC_API_URL!),
   });
 
   // Serialize (dehydrate) the query cache and pass it to the client

@@ -34,12 +34,4 @@ export class ApartmentService {
       images: dto.images,
     });
   }
-
-  findWithFilters(query: {
-    unitName?: string;
-    unitNumber?: string;
-    project?: string;
-  }) {
-    return this.repo.findWithFilters(query);
-  }
 }

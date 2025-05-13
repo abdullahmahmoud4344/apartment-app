@@ -1,5 +1,4 @@
 "use client";
-import classes from "./homepage.module.css";
 import { Apartment } from "@/app/models/Apartment.model";
 import getApartments from "@/app/lib/getApartments";
 import ApartmentCard from "./ApartmentCard";
@@ -19,7 +18,7 @@ export default function ApartmentsPage() {
     error,
   } = useQuery<Apartment[]>({
     queryKey: ["apartments"],
-    queryFn: getApartments,
+    queryFn: () => getApartments(),
   });
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -27,7 +26,9 @@ export default function ApartmentsPage() {
   const [searchTerm, setSearchTerm] = useState("");
 
   const refreshApartments = () => {
-    queryClient.invalidateQueries({ queryKey: ["apartments"] });
+    queryClient.invalidateQueries({
+      queryKey: ["apartments"],
+    });
   };
 
   if (isLoading) return <div>Loading...</div>;

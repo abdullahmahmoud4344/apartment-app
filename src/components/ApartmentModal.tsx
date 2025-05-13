@@ -1,5 +1,7 @@
 "use client";
 
+import { useCreateApartment } from "@/app/lib/hooks/useCreateApartment";
+import { useUploadApartmentsImages } from "@/app/lib/hooks/useUploadApartmentsImages";
 import { useState } from "react";
 
 export default function CreateApartmentModal({
@@ -21,6 +23,10 @@ export default function CreateApartmentModal({
   const [imagePreviews, setImagePreviews] = useState<
     { file: File; url: string }[]
   >([]);
+
+  const { mutate: uploadImages } = useUploadApartmentsImages();
+
+  const { mutateAsync: createApartment } = useCreateApartment();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -56,32 +62,32 @@ export default function CreateApartmentModal({
       const formDataImages = new FormData();
       imagePreviews.forEach((p) => formDataImages.append("images", p.file));
 
-      const uploadRes = await fetch("http://localhost:3001/apartments/upload", {
-        method: "POST",
-        body: formDataImages,
+      uploadImages(formDataImages, {
+        onSuccess: (data) => {
+          const { urls } = data;
+          createApartment(
+            {
+              formData,
+              urls,
+            },
+            {
+              onSuccess: () => {
+                onSuccess();
+                onClose();
+              },
+              onError: () => {
+                alert("Failed to create apartment.");
+              },
+            }
+          );
+        },
+        onError: (err) => {
+          throw err;
+        },
       });
-
-      const { urls } = await uploadRes.json();
-
-      const response = await fetch("http://localhost:3001/apartments", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...formData,
-          unitNumber: Number(formData.unitNumber),
-          price: parseFloat(formData.price),
-          images: urls,
-        }),
-      });
-
-      if (response.ok) {
-        onSuccess();
-        onClose();
-      } else {
-        alert("Failed to create apartment.");
-      }
-    } catch (err) {
-      alert("An error occurred.");
+    } catch (error) {
+      console.error(error);
+      alert(`An error occurred.`);
     } finally {
       setIsSubmitting(false);
     }

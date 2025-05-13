@@ -12,9 +12,9 @@ export default function ApartmentCard({ apartment }: ApartmentCardProps) {
       <div className="relative w-full h-48 mb-4">
         <Image
           src={apartment.images[0]}
-          alt="Apartment"
-          fill
+          alt={apartment.unitName}
           className="rounded-t-lg object-cover"
+          fill
         />
       </div>
       <h2 className="text-xl font-semibold">{apartment.unitName}</h2>

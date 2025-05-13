@@ -16,8 +16,8 @@ async function main() {
     );
 
     const apartment = await prisma.apartment.upsert({
-      where: { id }, // Assumes unitNumber is unique
-      update: {}, // No update behavior for now
+      where: { id },
+      update: {},
       create: {
         unitName,
         unitNumber,
@@ -25,7 +25,10 @@ async function main() {
         price,
         images: Array.from({
           length: faker.number.int({ min: 1, max: 5 }),
-        }).map(() => `http://localhost:3001/uploads/apart1.jpeg`),
+        }).map(
+          () =>
+            `${process.env.BASE_URL!.replace('localhost', 'api')}/uploads/apart1.jpeg`,
+        ),
       },
     });
 

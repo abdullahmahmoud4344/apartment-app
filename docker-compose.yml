@@ -5,24 +5,25 @@ services:
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: mysecretpassword
-      POSTGRES_DB: apartments_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=mysecretpassword
+      - POSTGRES_DB=apartments_db
     volumes:
       - pgdata:/var/lib/postgresql/data
 
-  # web:
-  #   build: .
-  #   container_name: nextjs_app
-  #   ports:
-  #     - "3000:3000"
-  #   depends_on:
-  #     - db
-  #   environment:
-  #     DATABASE_URL: postgres://postgres:mysecretpassword@db:5432/apartments_db
-  #   volumes:
-  #     - ./:/app
-  #   command: npm run dev
+  web:
+    build: .
+    container_name: nextjs_app
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    environment:
+      - NEXT_PUBLIC_API_URL=http://api:3001
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    command: npm run dev
 
   api:
     build:
@@ -35,6 +36,8 @@ services:
       - db
     environment:
       - DATABASE_URL=postgres://postgres:mysecretpassword@db:5432/apartments_db
+      - BASE_URL=http://localhost:3001
+      - FRONTEND_URL=http://web:3000
     volumes:
       - ./apartments_backend:/app
       - ./uploads:/app/uploads

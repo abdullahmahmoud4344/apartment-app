@@ -1,10 +1,13 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  // devIndicators: { autoPrerender: false },
   images: {
-    remotePatterns: [new URL("http://localhost:3001/**")],
+    remotePatterns: [
+      new URL(process.env.NEXT_PUBLIC_API_URL + "/**"),
+      new URL(
+        process.env.NEXT_PUBLIC_API_URL!.replace("api", "localhost") + "/**"
+      ),
+    ],
   },
 };
 
